@@ -30,9 +30,7 @@ const createNew = async (req, res, next) => {
       abortEarly: false, //nó có dứng sớm hay ko ví dụ title lỗi thì trả về luôn mà ko chyaj cái des nữa
       //để là false thì chạy hết(mặc định là true)
     });
-    res.status(StatusCodes.CREATED).json({
-      message: "Note Post from validation:create new  post",
-    });
+    next();
   } catch (error) {
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
       errors: new Error(error).message, //new Error(error) trả về string luôn dễ lấy
