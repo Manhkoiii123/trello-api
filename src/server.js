@@ -1,21 +1,21 @@
 /* eslint-disable no-console */
 import express from "express";
-import { CONNECT_DB, GET_DB, CLOSE_DB } from "~/config/mongodb";
+import { CONNECT_DB, CLOSE_DB } from "~/config/mongodb";
 import exitHook from "async-exit-hook";
+import { env } from "~/config/environment";
 const START_SERVER = () => {
   const app = express();
 
-  const hostname = "localhost";
-  const port = 8017;
-
   app.get("/", async (req, res) => {
     // hàm listco là hàm trả ra 1 promise nên cần có aw
-    console.log(await GET_DB().listCollections().toArray());
+    // console.log(await GET_DB().listCollections().toArray());
     res.end("<h1>Hello World!</h1><hr>");
   });
 
-  app.listen(port, hostname, () => {
-    console.log(`Hello Manhtd, I am running at http://${hostname}:${port}/`);
+  app.listen(env.APP_PORT, env.APP_HOST, () => {
+    console.log(
+      `Hello ${env.AUTHOR}, I am running at http://${env.APP_HOST}:${env.APP_PORT}/`
+    );
   });
   exitHook(() => {
     CLOSE_DB();
