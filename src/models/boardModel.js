@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { GET_DB } from "~/config/mongodb";
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from "~/utils/validators";
-
+import { ObjectId } from "mongodb";
 //Define collection
 const BOARD_COLLECTION_NAME = "boards";
 const BOARD_COLLECTION_SCHEMA = Joi.object({
@@ -15,13 +15,18 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp("javascript").default(null),
   _destroy: Joi.boolean().default(false),
 });
-
+const validateBeforCreate = async (data) => {
+  return await BOARD_COLLECTION_SCHEMA.validateAsync(data, {
+    abortEarly: false,
+  });
+};
 const createNew = async (data) => {
   //data từ serve gửi sag
   try {
+    const validData = await validateBeforCreate(data);
     const createdBoard = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
-      .insertOne(data);
+      .insertOne(validData);
     return createdBoard;
   } catch (error) {
     throw new Error(error);
@@ -29,9 +34,11 @@ const createNew = async (data) => {
 };
 const findOneById = async (id) => {
   try {
-    const res = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({
-      _id: id, //cái id ày phải là ObjectId
-    });
+    const res = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOne({
+        _id: new ObjectId(id), //cái id ày phải là ObjectId
+      });
     return res;
   } catch (error) {
     throw new Error(error);
