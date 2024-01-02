@@ -1,16 +1,15 @@
 import { StatusCodes } from "http-status-codes";
+import { boardService } from "~/services/boardService";
 // import ApiError from "~/utils/ApiError";
+
 const createNew = async (req, res, next) => {
   try {
-    // throw new ApiError(StatusCodes.BAD_GATEWAY, "test error");
-    res.status(StatusCodes.CREATED).json({
-      message: "Note Post from controlller:create new  post",
-    });
+    //điều hướng sag services
+    const createdBoard = await boardService.createNew(req.body);
+    //có kết quả trả về cho client
+    res.status(StatusCodes.CREATED).json(createdBoard);
   } catch (error) {
     next(error);
-    // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-    //   errors: error.message,
-    // });
   }
 };
 export const boardController = {
