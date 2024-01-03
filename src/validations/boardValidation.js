@@ -1,6 +1,7 @@
 import Joi from "joi";
 import { StatusCodes } from "http-status-codes";
 import ApiError from "~/utils/ApiError";
+import { BOARD_TYPES } from "~/utils/constants";
 const createNew = async (req, res, next) => {
   const correctCondition = Joi.object({
     //tạo post chỉ tạo bằng title và des thôi
@@ -25,6 +26,9 @@ const createNew = async (req, res, next) => {
         "string.trim":
           "description must not have leading or trailing whitespace",
       }),
+    type: Joi.string()
+      .valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE)
+      .required(),
   });
   try {
     await correctCondition.validateAsync(req.body, {
