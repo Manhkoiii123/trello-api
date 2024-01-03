@@ -85,7 +85,7 @@ const getDetails = async (postId) => {
         },
       ])
       .toArray();
-    return res[0] || {};
+    return res[0] || null;
   } catch (error) {
     throw new Error(error);
   }
