@@ -50,13 +50,7 @@ const findOneById = async (id) => {
 };
 //query toogr hợp(aggregate) để lấy all column và card thuộc về bỏad
 const getDetails = async (postId) => {
-  //tạm thời giống hệt hàm findone => sẽ update phần aggregate tiếp
   try {
-    // const res = await GET_DB()
-    //   .collection(BOARD_COLLECTION_NAME)
-    //   .findOne({
-    //     _id: new ObjectId(postId), //cái id ày phải là ObjectId
-    //   });
     const res = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .aggregate([
@@ -90,10 +84,33 @@ const getDetails = async (postId) => {
     throw new Error(error);
   }
 };
+const pushColumnOrderIds = async (column) => {
+  try {
+    const res = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        // tại sao lại là column.boardId => vì lúc tạo mới chạy hàm này
+        // thì đẩy lên 1 cái boardid
+        { _id: new ObjectId(column.boardId) }, // tìm cái board có cái column đấy
+        {
+          $push: {
+            // đẩy cái id của column mới tạo vào cuối mảng
+            columnOrderIds: new ObjectId(column._id),
+          },
+        },
+        //nếu ko có cái này thì trả ra bản ch được cập nhật
+        { returnDocument: "after" } // trả về cái doc mới sau cập nhật
+      );
+    return res.value; //findOneAndUpdate hàm  này trả ra vậy => thực tế cái bên kia cũng ko hứng cái này mà chỉ cần nó chạy đúng thôi
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createNew,
   getDetails,
   findOneById,
+  pushColumnOrderIds,
 };
