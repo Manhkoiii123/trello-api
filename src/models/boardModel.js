@@ -19,6 +19,7 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp("javascript").default(null),
   _destroy: Joi.boolean().default(false),
 });
+const INVALID_UPDATE_FIELDS = ["_id", "createdAt"]; // ko cho phép cập nhật
 const validateBeforCreate = async (data) => {
   return await BOARD_COLLECTION_SCHEMA.validateAsync(data, {
     abortEarly: false,
@@ -50,7 +51,13 @@ const findOneById = async (id) => {
 };
 //query toogr hợp(aggregate) để lấy all column và card thuộc về bỏad
 const getDetails = async (postId) => {
+  //tạm thời giống hệt hàm findone => sẽ update phần aggregate tiếp
   try {
+    // const res = await GET_DB()
+    //   .collection(BOARD_COLLECTION_NAME)
+    //   .findOne({
+    //     _id: new ObjectId(postId), //cái id ày phải là ObjectId
+    //   });
     const res = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .aggregate([
@@ -101,7 +108,28 @@ const pushColumnOrderIds = async (column) => {
         //nếu ko có cái này thì trả ra bản ch được cập nhật
         { returnDocument: "after" } // trả về cái doc mới sau cập nhật
       );
-    return res.value; //findOneAndUpdate hàm  này trả ra vậy => thực tế cái bên kia cũng ko hứng cái này mà chỉ cần nó chạy đúng thôi
+    return res; //findOneAndUpdate hàm  này trả ra vậy => thực tế cái bên kia cũng ko hứng cái này mà chỉ cần nó chạy đúng thôi
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const update = async (postId, updateData) => {
+  try {
+    Object.keys(updateData).forEach((fieldname) => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldname)) {
+        delete updateData[fieldname]; //xóa khỏi phần update vì ko cho update
+      }
+    });
+    const res = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(postId) },
+        {
+          $set: updateData,
+        },
+        { returnDocument: "after" }
+      );
+    return res; //findOneAndUpdate hàm  này trả ra vậy => thực tế cái bên kia cũng ko hứng cái này mà chỉ cần nó chạy đúng thôi
   } catch (error) {
     throw new Error(error);
   }
@@ -113,4 +141,5 @@ export const boardModel = {
   getDetails,
   findOneById,
   pushColumnOrderIds,
+  update,
 };
