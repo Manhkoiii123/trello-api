@@ -70,7 +70,7 @@ const pushCardOrderIds = async (card) => {
         //nếu ko có cái này thì trả ra bản ch được cập nhật
         { returnDocument: "after" } // trả về cái doc mới sau cập nhật
       );
-    return res.value; //findOneAndUpdate hàm  này trả ra vậy => thực tế cái bên kia cũng ko hứng cái này mà chỉ cần nó chạy đúng thôi
+    return res; //findOneAndUpdate hàm  này trả ra vậy => thực tế cái bên kia cũng ko hứng cái này mà chỉ cần nó chạy đúng thôi
   } catch (error) {
     throw new Error(error);
   }
