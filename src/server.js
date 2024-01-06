@@ -16,12 +16,21 @@ const START_SERVER = () => {
 
   //middleware xử lí lloix tập trung
   app.use(errorHandlingMiddleware);
+  if (env.BUILD_MODE === "production") {
+    app.listen(process.env.PORT, () => {
+      //render sẽ tự lấy port
+      console.log(
+        `Hello ${env.AUTHOR}, I am running at Port : ${process.env.PORT}/`
+      );
+    });
+  } else {
+    app.listen(env.APP_PORT, env.APP_HOST, () => {
+      console.log(
+        `Hello ${env.AUTHOR}, I am running at http://${env.APP_HOST}:${env.APP_PORT}/`
+      );
+    });
+  }
 
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
-    console.log(
-      `Hello ${env.AUTHOR}, I am running at http://${env.APP_HOST}:${env.APP_PORT}/`
-    );
-  });
   exitHook(() => {
     CLOSE_DB();
   });
