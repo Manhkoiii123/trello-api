@@ -113,6 +113,25 @@ const pushColumnOrderIds = async (column) => {
     throw new Error(error);
   }
 };
+const pullColumnOrderIds = async (column) => {
+  try {
+    const res = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(column.boardId) },
+        {
+          $pull: {
+            //kéo ra 1 column._id phần tử ra khỏi mảng rồi xóa nó đi
+            columnOrderIds: new ObjectId(column._id),
+          },
+        },
+        { returnDocument: "after" }
+      );
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 const update = async (postId, updateData) => {
   try {
     Object.keys(updateData).forEach((fieldname) => {
@@ -148,4 +167,5 @@ export const boardModel = {
   findOneById,
   pushColumnOrderIds,
   update,
+  pullColumnOrderIds,
 };
