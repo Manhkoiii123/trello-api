@@ -75,10 +75,39 @@ const pushCardOrderIds = async (card) => {
     throw new Error(error);
   }
 };
+const INVALID_UPDATE_FIELDS = ["_id", "boardId", "createdAt"]; // ko cho phép cập nhật
+const update = async (columnId, updateData) => {
+  try {
+    Object.keys(updateData).forEach((fieldname) => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldname)) {
+        delete updateData[fieldname]; //xóa khỏi phần update vì ko cho update
+      }
+    });
+    // đưa id về object
+    if (updateData.cardOrderIds) {
+      updateData.cardOrderIds = updateData.cardOrderIds.map(
+        (c) => new ObjectId(c)
+      );
+    }
+    const res = await GET_DB()
+      .collection(COLUMN_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(columnId) },
+        {
+          $set: updateData,
+        },
+        { returnDocument: "after" }
+      );
+    return res; //findOneAndUpdate hàm  này trả ra vậy => thực tế cái bên kia cũng ko hứng cái này mà chỉ cần nó chạy đúng thôi
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createNew,
   findOneById,
   pushCardOrderIds,
+  update,
 };

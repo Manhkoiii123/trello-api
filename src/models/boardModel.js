@@ -120,6 +120,12 @@ const update = async (postId, updateData) => {
         delete updateData[fieldname]; //xóa khỏi phần update vì ko cho update
       }
     });
+    // đưa id về object
+    if (updateData.columnOrderIds) {
+      updateData.columnOrderIds = updateData.columnOrderIds.map(
+        (c) => new ObjectId(c)
+      );
+    }
     const res = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .findOneAndUpdate(
