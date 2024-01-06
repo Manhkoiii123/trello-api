@@ -103,6 +103,18 @@ const update = async (columnId, updateData) => {
     throw new Error(error);
   }
 };
+const deleteOneById = async (id) => {
+  try {
+    const res = await GET_DB()
+      .collection(COLUMN_COLLECTION_NAME)
+      .deleteOne({
+        _id: new ObjectId(id), //cái id này phải là ObjectId
+      });
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
@@ -110,4 +122,5 @@ export const columnModel = {
   findOneById,
   pushCardOrderIds,
   update,
+  deleteOneById,
 };
