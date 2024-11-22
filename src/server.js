@@ -10,6 +10,13 @@ import { errorHandlingMiddleware } from "~/middlewares/errorHandlingMiddleware";
 import { corsOptions } from "./config/cors";
 const START_SERVER = () => {
   const app = express();
+
+  // fix cache
+  app.use((req, res, next) => {
+    res.setHeader("Cache-Control", "no-store");
+    next();
+  });
+
   app.use(cookieParser());
   app.use(cors(corsOptions));
   app.use(express.json());
