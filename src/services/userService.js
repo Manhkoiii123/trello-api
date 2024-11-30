@@ -116,9 +116,31 @@ const login = async (data) => {
     throw new Error(error);
   }
 };
+const refreshToken = async (clientRefreshToken) => {
+  try {
+    const decoded = await JwtProvider.verifyToken(
+      clientRefreshToken,
+      env.REFRESH_TOKEN_SECRET_SIGNATURE
+    );
+    const userInfo = {
+      _id: decoded._id,
+      email: decoded.email,
+    };
+    const accessToken = await JwtProvider.generateToken(
+      userInfo,
+      env.ACCESS_TOKEN_LIFE,
+      env.ACCESS_TOKEN_SECRET_SIGNATURE
+    );
+    return {
+      accessToken,
+    };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const userService = {
   createNew,
   verifyAccount,
   login,
+  refreshToken,
 };
-//2518
