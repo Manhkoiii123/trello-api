@@ -138,9 +138,44 @@ const refreshToken = async (clientRefreshToken) => {
     throw new Error(error);
   }
 };
+const update = async (userId, data) => {
+  try {
+    const existUser = await userModel.findOneById(userId);
+    if (!existUser) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "User not found");
+    }
+    if (!existUser.isActive) {
+      throw new ApiError(
+        StatusCodes.NOT_ACCEPTABLE,
+        "Account is not active yet"
+      );
+    }
+    let updateData = {};
+
+    if (data.current_password && data.new_password) {
+      // change password
+      if (!bcryptjs.compareSync(data.current_password, existUser.password)) {
+        throw new ApiError(
+          StatusCodes.NOT_ACCEPTABLE,
+          "Current password is incorrect"
+        );
+      }
+      updateData = await userModel.update(existUser._id, {
+        password: bcryptjs.hashSync(data.new_password, 10),
+      });
+    } else {
+      // update tt chung
+      updateData = await userModel.update(existUser._id, data);
+    }
+    return pickUser(updateData);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const userService = {
   createNew,
   verifyAccount,
   login,
   refreshToken,
+  update,
 };
