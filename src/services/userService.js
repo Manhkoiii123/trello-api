@@ -8,6 +8,7 @@ import { WEBSITE_DOMAIN } from "~/utils/constants";
 import { brevoProvider } from "~/providers/brevoProvider";
 import { env } from "~/config/environment";
 import { JwtProvider } from "~/providers/JwtProvider";
+import { cloudinaryProvider } from "~/providers/cloudinaryProvider";
 const createNew = async (userData) => {
   try {
     // kiểm tra email đã có trong hệ thống chưa
@@ -138,7 +139,7 @@ const refreshToken = async (clientRefreshToken) => {
     throw new Error(error);
   }
 };
-const update = async (userId, data) => {
+const update = async (userId, data, userAvatarFile) => {
   try {
     const existUser = await userModel.findOneById(userId);
     if (!existUser) {
@@ -162,6 +163,15 @@ const update = async (userId, data) => {
       }
       updateData = await userModel.update(existUser._id, {
         password: bcryptjs.hashSync(data.new_password, 10),
+      });
+    } else if (userAvatarFile) {
+      // update avatar lên cloudinary
+      const uploadResult = await cloudinaryProvider.streamUpload(
+        userAvatarFile.buffer,
+        "trello-app"
+      );
+      updateData = await userModel.update(existUser._id, {
+        avatar: uploadResult.secure_url,
       });
     } else {
       // update tt chung
