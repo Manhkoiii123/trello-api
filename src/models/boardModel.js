@@ -58,24 +58,23 @@ const findOneById = async (id) => {
     throw new Error(error);
   }
 };
-//query toogr hợp(aggregate) để lấy all column và card thuộc về bỏad
-const getDetails = async (postId) => {
-  //tạm thời giống hệt hàm findone => sẽ update phần aggregate tiếp
+//query tổng hợp(aggregate) để lấy all column và card thuộc về board
+const getDetails = async (userId, boardId) => {
   try {
-    // const res = await GET_DB()
-    //   .collection(BOARD_COLLECTION_NAME)
-    //   .findOne({
-    //     _id: new ObjectId(postId), //cái id ày phải là ObjectId
-    //   });
+    const queryCondition = [
+      { _id: new ObjectId(boardId) },
+      { _destroy: false },
+      {
+        $or: [
+          { ownerIds: { $all: [new ObjectId(userId)] } },
+          { memberIds: { $all: [new ObjectId(userId)] } },
+        ],
+      },
+    ];
     const res = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .aggregate([
-        {
-          $match: {
-            _id: new ObjectId(postId),
-            _destroy: false,
-          },
-        },
+        { $match: { $and: queryCondition } },
         {
           $lookup: {
             from: columnModel.COLUMN_COLLECTION_NAME, // đứng từ borad tìm đế coll column
@@ -141,7 +140,7 @@ const pullColumnOrderIds = async (column) => {
     throw new Error(error);
   }
 };
-const update = async (postId, updateData) => {
+const update = async (boardId, updateData) => {
   try {
     Object.keys(updateData).forEach((fieldname) => {
       if (INVALID_UPDATE_FIELDS.includes(fieldname)) {
@@ -157,7 +156,7 @@ const update = async (postId, updateData) => {
     const res = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .findOneAndUpdate(
-        { _id: new ObjectId(postId) },
+        { _id: new ObjectId(boardId) },
         {
           $set: updateData,
         },

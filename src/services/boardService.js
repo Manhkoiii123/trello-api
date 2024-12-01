@@ -25,9 +25,9 @@ const createNew = async (reqBody) => {
     throw error;
   }
 };
-const getDetails = async (postId) => {
+const getDetails = async (userId, boardId) => {
   try {
-    const board = await boardModel.getDetails(postId);
+    const board = await boardModel.getDetails(userId, boardId);
 
     if (!board) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Không tìm thấy board");
@@ -47,13 +47,13 @@ const getDetails = async (postId) => {
     throw error;
   }
 };
-const update = async (postId, body) => {
+const update = async (boardId, body) => {
   try {
     const updateData = {
       ...body,
       updatedAt: Date.now(),
     };
-    const updatedBoard = await boardModel.update(postId, updateData);
+    const updatedBoard = await boardModel.update(boardId, updateData);
     return updatedBoard;
   } catch (error) {
     throw error;
