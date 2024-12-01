@@ -34,13 +34,16 @@ const validateBeforCreate = async (data) => {
     abortEarly: false,
   });
 };
-const createNew = async (data) => {
-  //data từ serve gửi sag
+const createNew = async (userId, data) => {
   try {
     const validData = await validateBeforCreate(data);
+    const newBoardToAdd = {
+      ...validData,
+      ownerIds: [new ObjectId(userId)],
+    };
     const createdBoard = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
-      .insertOne(validData);
+      .insertOne(newBoardToAdd);
     return createdBoard;
   } catch (error) {
     throw new Error(error);

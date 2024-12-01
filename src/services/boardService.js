@@ -7,19 +7,15 @@ import { cloneDeep } from "lodash";
 import { columnModel } from "~/models/columnModel";
 import { cardModel } from "~/models/cardModel";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "~/utils/constants";
-const createNew = async (reqBody) => {
+const createNew = async (userId, reqBody) => {
   try {
     const newBoard = {
       ...reqBody,
       slug: slugify(reqBody.title),
     };
-    //gọi đế tầng model để xử lí lưu bản ghi trong db
-    const createdBoard = await boardModel.createNew(newBoard);
-    //lấy bản ghi sau khi gọi
+    const createdBoard = await boardModel.createNew(userId, newBoard);
     const getNewBoard = await boardModel.findOneById(createdBoard.insertedId);
 
-    //trả kết quả về trog services (luôn phải có)
-    //cái return này chính là cái trả ra để nhận được và gán vào biến ở bên boardController
     return getNewBoard;
   } catch (error) {
     throw error;
