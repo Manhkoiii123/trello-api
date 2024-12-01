@@ -22,9 +22,10 @@ const createNew = async (req, res, next) => {
 };
 const getDetails = async (req, res, next) => {
   try {
+    const userId = req.jwtDecoded._id;
     //lấy params ra
     const boardId = req.params.id; //:id
-    const board = await boardService.getDetails(boardId);
+    const board = await boardService.getDetails(userId, boardId);
     res.status(StatusCodes.OK).json(board);
   } catch (error) {
     next(error);
