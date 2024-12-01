@@ -12,9 +12,8 @@ const getBoards = async (req, res, next) => {
 };
 const createNew = async (req, res, next) => {
   try {
-    //điều hướng sag services
-    const createdBoard = await boardService.createNew(req.body);
-    //có kết quả trả về cho client
+    const userId = req.jwtDecoded._id;
+    const createdBoard = await boardService.createNew(userId, req.body);
     res.status(StatusCodes.CREATED).json(createdBoard);
   } catch (error) {
     next(error);
