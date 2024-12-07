@@ -28,4 +28,19 @@ const createNew = async (req, res, next) => {
     next(customError);
   }
 };
-export const cardValidation = { createNew };
+const update = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    title: Joi.string().min(3).max(50).trim().strict(),
+    description: Joi.string().optional(),
+  });
+  try {
+    await correctCondition.validateAsync(req.body, {
+      abortEarly: false,
+      allowUnknown: true,
+    });
+    next();
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNAUTHORIZED, new Error(error).message));
+  }
+};
+export const cardValidation = { createNew, update };
