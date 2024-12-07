@@ -6,6 +6,7 @@ import { BOARD_TYPES } from "~/utils/constants";
 import { columnModel } from "./columnModel";
 import { cardModel } from "./cardModel";
 import { pagingSkipValue } from "~/utils/algorithms";
+import { userModel } from "./userModal";
 //Define collection
 const BOARD_COLLECTION_NAME = "boards";
 const BOARD_COLLECTION_SCHEMA = Joi.object({
@@ -93,6 +94,27 @@ const getDetails = async (userId, boardId) => {
             localField: "_id",
             foreignField: "boardId",
             as: "cards",
+          },
+        },
+        {
+          //tt với user members
+          $lookup: {
+            from: userModel.USER_COLECTION_NAME,
+            localField: "memberIds",
+            foreignField: "_id",
+            as: "members",
+            // select các trường cần lấy
+            pipeline: [{ $project: { password: 0, verifyToken: 0 } }],
+          },
+        },
+        {
+          //tt với user owners
+          $lookup: {
+            from: userModel.USER_COLECTION_NAME,
+            localField: "ownerIds",
+            foreignField: "_id",
+            as: "owners",
+            pipeline: [{ $project: { password: 0, verifyToken: 0 } }],
           },
         },
       ])
