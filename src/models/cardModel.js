@@ -113,6 +113,28 @@ const deleteManyByColumId = async (columnId) => {
     throw new Error(error);
   }
 };
+const unShiftNewComment = async (cardId, commentData) => {
+  try {
+    const res = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(cardId) },
+        {
+          $push: {
+            comments: {
+              // trong mongo ko ko có unshift nên phải dùng $push
+              $each: [commentData],
+              $position: 0,
+            },
+          },
+        },
+        { returnDocument: "after" }
+      );
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
@@ -120,4 +142,5 @@ export const cardModel = {
   findOneById,
   update,
   deleteManyByColumId,
+  unShiftNewComment,
 };
