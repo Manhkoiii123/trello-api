@@ -9,4 +9,12 @@ Router.route("/board").post(
   invitationValidation.createNewBoardInvitation,
   invitationController.createNewBoardInvitation
 );
+Router.route("/").get(
+  authMiddleware.isAuthorized,
+  invitationController.getInvitations
+);
+Router.route("/board/:invitationId").put(
+  authMiddleware.isAuthorized,
+  invitationController.updateInvitationStatus
+);
 export const invitationRoute = Router;
