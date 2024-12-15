@@ -8,6 +8,10 @@ import { APIs_V1 } from "~/routes/v1";
 import cookieParser from "cookie-parser";
 import { errorHandlingMiddleware } from "~/middlewares/errorHandlingMiddleware";
 import { corsOptions } from "./config/cors";
+import socketIo from "socket.io";
+import http from "http";
+import { inviteUserToBoardSocket } from "./sockets/inviteUserToBoardSocket";
+
 const START_SERVER = () => {
   const app = express();
 
@@ -24,15 +28,23 @@ const START_SERVER = () => {
 
   //middleware xử lí lloix tập trung
   app.use(errorHandlingMiddleware);
+
+  // socket io
+  const server = http.createServer(app);
+  const io = socketIo(server, {
+    cors: corsOptions,
+  });
+  io.on("connection", (socket) => inviteUserToBoardSocket(socket));
+
   if (env.BUILD_MODE === "production") {
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       //render sẽ tự lấy port
       console.log(
         `Hello ${env.AUTHOR}, I am running at Port : ${process.env.PORT}/`
       );
     });
   } else {
-    app.listen(env.APP_PORT, env.APP_HOST, () => {
+    server.listen(env.APP_PORT, env.APP_HOST, () => {
       console.log(
         `Hello ${env.AUTHOR}, I am running at http://${env.APP_HOST}:${env.APP_PORT}/`
       );
